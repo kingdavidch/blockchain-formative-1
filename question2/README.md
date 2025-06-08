@@ -23,7 +23,6 @@ This project implements an enhanced blockchain in C with transaction support and
 ## Requirements
 
 - GCC compiler
-- OpenSSL development libraries
 - Make
 
 ## Building the Project
@@ -70,6 +69,15 @@ Each transaction includes:
 - Receiver address
 - Amount
 - Timestamp
+
+### Example Transactions
+
+The program demonstrates transactions between three participants:
+1. King -> Jack: 10.50
+2. Jack -> Kraed: 5.00
+3. Kraed -> King: 7.50
+4. Jack -> King: 3.00
+5. King -> Kraed: 2.50
 
 ### Blockchain Operations
 
