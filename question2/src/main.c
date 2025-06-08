@@ -11,12 +11,12 @@ void test_blockchain() {
     }
 
     // Add some transactions to the genesis block
-    if (!add_transaction(chain->genesis, "Alice", "Bob", 10.5)) {
+    if (!add_transaction(chain->genesis, "King", "Jack", 10.5)) {
         printf("Failed to add transaction to genesis block\n");
         free_blockchain(chain);
         return;
     }
-    if (!add_transaction(chain->genesis, "Bob", "Charlie", 5.0)) {
+    if (!add_transaction(chain->genesis, "Jack", "Kraed", 5.0)) {
         printf("Failed to add transaction to genesis block\n");
         free_blockchain(chain);
         return;
@@ -25,12 +25,12 @@ void test_blockchain() {
 
     // Add a new block with transactions
     add_block(chain);
-    if (!add_transaction(chain->latest, "Charlie", "Alice", 7.5)) {
+    if (!add_transaction(chain->latest, "Kraed", "King", 7.5)) {
         printf("Failed to add transaction to block\n");
         free_blockchain(chain);
         return;
     }
-    if (!add_transaction(chain->latest, "Bob", "Alice", 3.0)) {
+    if (!add_transaction(chain->latest, "Jack", "King", 3.0)) {
         printf("Failed to add transaction to block\n");
         free_blockchain(chain);
         return;
@@ -39,7 +39,7 @@ void test_blockchain() {
 
     // Add another block
     add_block(chain);
-    if (!add_transaction(chain->latest, "Alice", "Charlie", 2.5)) {
+    if (!add_transaction(chain->latest, "King", "Kraed", 2.5)) {
         printf("Failed to add transaction to block\n");
         free_blockchain(chain);
         return;
