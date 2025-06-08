@@ -1,0 +1,34 @@
+Task 1: SHA-256 Hashing
+=======================
+Input: Blockchain Cryptography
+SHA-256 Hash: e82f9bcc4aec6c59e57953e8f6e4ffdecf6a2d0ee55fcd114b87f21f017d9a4c
+
+Task 2: Simple Blockchain Simulation
+===================================
+Blockchain Contents:
+Block #0
+Timestamp: 1749408412
+Data: Genesis Block
+Previous Hash: 0000000000000000000000000000000000000000000000000000000000000000
+Hash: a342de5fc9da2cdf1bd4403d2405cbf57939f2003d4d5e5e50346c9c7777f96d
+
+Block #1
+Timestamp: 1749408412
+Data: First Block Data
+Previous Hash: a342de5fc9da2cdf1bd4403d2405cbf57939f2003d4d5e5e50346c9c7777f96d
+Hash: 8b55db2ab01c49cd6a57c2d4ec419634a2985c157668befef1ccddac3e3c50ee
+
+Block #2
+Timestamp: 1749408412
+Data: Second Block Data
+Previous Hash: 8b55db2ab01c49cd6a57c2d4ec419634a2985c157668befef1ccddac3e3c50ee
+Hash: 460ef4923296f16fcbc7477aea80651209b8a4da5849ebaad7c5f435c7e33c72
+
+Block #3
+Timestamp: 1749408412
+Data: Third Block Data
+Previous Hash: 460ef4923296f16fcbc7477aea80651209b8a4da5849ebaad7c5f435c7e33c72
+Hash: 802bdb121561a5123615d991e1ed98365be33182c762b019a268674eb90bb73e
+
+Validating blockchain...
+Blockchain is valid!

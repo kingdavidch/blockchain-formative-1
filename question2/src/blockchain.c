@@ -218,17 +218,26 @@ Blockchain* load_blockchain(const char* filename) {
 
     // Read blocks
     Block* current = chain->genesis;
-    while (1) {
-        if (fread(&current->index, sizeof(uint32_t), 1, file) != 1 ||
-            fread(&current->timestamp, sizeof(time_t), 1, file) != 1 ||
-            fread(&current->transaction_count, sizeof(int), 1, file) != 1 ||
-            fread(current->transactions, sizeof(Transaction), current->transaction_count, file) != current->transaction_count ||
-            fread(current->previous_hash, sizeof(uint8_t), SHA256_DIGEST_SIZE, file) != SHA256_DIGEST_SIZE ||
-            fread(current->hash, sizeof(uint8_t), SHA256_DIGEST_SIZE, file) != SHA256_DIGEST_SIZE) {
-            free_blockchain(chain);
-            fclose(file);
-            return NULL;
-        }
+    while (!feof(file)) {
+        size_t read_size;
+        
+        read_size = fread(&current->index, sizeof(uint32_t), 1, file);
+        if (read_size != 1) break;
+        
+        read_size = fread(&current->timestamp, sizeof(time_t), 1, file);
+        if (read_size != 1) break;
+        
+        read_size = fread(&current->transaction_count, sizeof(int), 1, file);
+        if (read_size != 1) break;
+        
+        read_size = fread(current->transactions, sizeof(Transaction), current->transaction_count, file);
+        if (read_size != current->transaction_count) break;
+        
+        read_size = fread(current->previous_hash, sizeof(uint8_t), SHA256_DIGEST_SIZE, file);
+        if (read_size != SHA256_DIGEST_SIZE) break;
+        
+        read_size = fread(current->hash, sizeof(uint8_t), SHA256_DIGEST_SIZE, file);
+        if (read_size != SHA256_DIGEST_SIZE) break;
 
         // Check if we've reached the end of the file
         if (feof(file)) break;
