@@ -1,6 +1,5 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g
-LDFLAGS = -lssl -lcrypto
 SRC_DIR = src
 OBJ_DIR = obj
 BIN_DIR = bin
@@ -15,7 +14,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	@mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $^
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(OBJ_DIR)

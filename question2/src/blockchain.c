@@ -1,22 +1,11 @@
 #include "blockchain.h"
-#include <openssl/sha.h>
-#include <openssl/evp.h>
-
-// Helper function to calculate SHA-256 hash
-void calculate_sha256(const char* input, char* output) {
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    SHA256_CTX sha256;
-    SHA256_Init(&sha256);
-    SHA256_Update(&sha256, input, strlen(input));
-    SHA256_Final(hash, &sha256);
-    
-    for(int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
-        sprintf(output + (i * 2), "%02x", hash[i]);
-    }
-    output[64] = '\0';
-}
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 Blockchain* create_blockchain(int difficulty) {
+    if (difficulty < 0) return NULL;
+
     Blockchain* chain = (Blockchain*)malloc(sizeof(Blockchain));
     if (!chain) return NULL;
 
@@ -38,46 +27,54 @@ Block* create_block() {
     block->index = 0;
     block->timestamp = time(NULL);
     block->transaction_count = 0;
-    memset(block->previous_hash, '0', 64);
-    block->previous_hash[64] = '\0';
+    memset(block->previous_hash, 0, SHA256_DIGEST_SIZE);
     block->next = NULL;
 
     calculate_block_hash(block);
     return block;
 }
 
-void add_transaction(Block* block, const char* sender, const char* receiver, double amount) {
-    if (!block || block->transaction_count >= MAX_TRANSACTIONS) return;
+int add_transaction(Block* block, const char* sender, const char* receiver, double amount) {
+    if (!block || !sender || !receiver || amount <= 0) return 0;
+    if (block->transaction_count >= MAX_TRANSACTIONS) return 0;
 
     Transaction* tx = &block->transactions[block->transaction_count];
     strncpy(tx->sender, sender, 63);
+    tx->sender[63] = '\0';
     strncpy(tx->receiver, receiver, 63);
+    tx->receiver[63] = '\0';
     tx->amount = amount;
     tx->timestamp = time(NULL);
     
     block->transaction_count++;
+    return 1;
 }
 
 void calculate_block_hash(Block* block) {
-    char input[MAX_DATA_SIZE];
-    char transaction_data[MAX_TRANSACTION_SIZE];
+    if (!block) return;
+
+    SHA256_CTX ctx;
+    sha256_init(&ctx);
     
-    // Create input string with block data
-    sprintf(input, "%u%ld", block->index, block->timestamp);
+    // Hash the block's index
+    sha256_update(&ctx, (uint8_t*)&block->index, sizeof(block->index));
     
-    // Add transactions to input
+    // Hash the timestamp
+    sha256_update(&ctx, (uint8_t*)&block->timestamp, sizeof(block->timestamp));
+    
+    // Hash the transactions
     for (int i = 0; i < block->transaction_count; i++) {
         Transaction* tx = &block->transactions[i];
-        sprintf(transaction_data, "%s%s%f%ld", 
-                tx->sender, tx->receiver, tx->amount, tx->timestamp);
-        strcat(input, transaction_data);
+        sha256_update(&ctx, (uint8_t*)tx->sender, strlen(tx->sender));
+        sha256_update(&ctx, (uint8_t*)tx->receiver, strlen(tx->receiver));
+        sha256_update(&ctx, (uint8_t*)&tx->amount, sizeof(tx->amount));
+        sha256_update(&ctx, (uint8_t*)&tx->timestamp, sizeof(tx->timestamp));
     }
     
-    // Add previous hash
-    strcat(input, block->previous_hash);
+    // Hash the previous block's hash
+    sha256_update(&ctx, block->previous_hash, SHA256_DIGEST_SIZE);
     
-    // Calculate hash
-    calculate_sha256(input, block->hash);
+    sha256_final(&ctx, block->hash);
 }
 
 void add_block(Blockchain* chain) {
@@ -87,7 +84,7 @@ void add_block(Blockchain* chain) {
     if (!new_block) return;
 
     new_block->index = chain->latest->index + 1;
-    strcpy(new_block->previous_hash, chain->latest->hash);
+    memcpy(new_block->previous_hash, chain->latest->hash, SHA256_DIGEST_SIZE);
     
     calculate_block_hash(new_block);
     
@@ -99,32 +96,34 @@ int validate_chain(Blockchain* chain) {
     if (!chain || !chain->genesis) return 0;
 
     Block* current = chain->genesis;
-    char calculated_hash[65];
+    uint8_t calculated_hash[SHA256_DIGEST_SIZE];
 
     while (current) {
         // Calculate hash of current block
-        char input[MAX_DATA_SIZE];
-        char transaction_data[MAX_TRANSACTION_SIZE];
+        SHA256_CTX ctx;
+        sha256_init(&ctx);
         
-        sprintf(input, "%u%ld", current->index, current->timestamp);
+        sha256_update(&ctx, (uint8_t*)&current->index, sizeof(current->index));
+        sha256_update(&ctx, (uint8_t*)&current->timestamp, sizeof(current->timestamp));
         
         for (int i = 0; i < current->transaction_count; i++) {
             Transaction* tx = &current->transactions[i];
-            sprintf(transaction_data, "%s%s%f%ld", 
-                    tx->sender, tx->receiver, tx->amount, tx->timestamp);
-            strcat(input, transaction_data);
+            sha256_update(&ctx, (uint8_t*)tx->sender, strlen(tx->sender));
+            sha256_update(&ctx, (uint8_t*)tx->receiver, strlen(tx->receiver));
+            sha256_update(&ctx, (uint8_t*)&tx->amount, sizeof(tx->amount));
+            sha256_update(&ctx, (uint8_t*)&tx->timestamp, sizeof(tx->timestamp));
         }
         
-        strcat(input, current->previous_hash);
-        calculate_sha256(input, calculated_hash);
+        sha256_update(&ctx, current->previous_hash, SHA256_DIGEST_SIZE);
+        sha256_final(&ctx, calculated_hash);
 
         // Compare calculated hash with stored hash
-        if (strcmp(calculated_hash, current->hash) != 0) {
+        if (memcmp(calculated_hash, current->hash, SHA256_DIGEST_SIZE) != 0) {
             return 0;
         }
 
         // If there's a next block, verify its previous hash matches current block's hash
-        if (current->next && strcmp(current->hash, current->next->previous_hash) != 0) {
+        if (current->next && memcmp(current->hash, current->next->previous_hash, SHA256_DIGEST_SIZE) != 0) {
             return 0;
         }
 
@@ -139,9 +138,15 @@ void print_block(Block* block) {
 
     printf("\nBlock #%u\n", block->index);
     printf("Timestamp: %ld\n", block->timestamp);
-    printf("Previous Hash: %s\n", block->previous_hash);
-    printf("Hash: %s\n", block->hash);
-    printf("Transactions:\n");
+    printf("Previous Hash: ");
+    for (int i = 0; i < SHA256_DIGEST_SIZE; i++) {
+        printf("%02x", block->previous_hash[i]);
+    }
+    printf("\nHash: ");
+    for (int i = 0; i < SHA256_DIGEST_SIZE; i++) {
+        printf("%02x", block->hash[i]);
+    }
+    printf("\nTransactions:\n");
     
     for (int i = 0; i < block->transaction_count; i++) {
         Transaction* tx = &block->transactions[i];
@@ -161,28 +166,35 @@ void print_blockchain(Blockchain* chain) {
     }
 }
 
-void save_blockchain(Blockchain* chain, const char* filename) {
-    if (!chain || !filename) return;
+int save_blockchain(Blockchain* chain, const char* filename) {
+    if (!chain || !filename) return 0;
 
     FILE* file = fopen(filename, "wb");
-    if (!file) return;
+    if (!file) return 0;
 
     // Write blockchain metadata
-    fwrite(&chain->difficulty, sizeof(int), 1, file);
+    if (fwrite(&chain->difficulty, sizeof(int), 1, file) != 1) {
+        fclose(file);
+        return 0;
+    }
 
     // Write blocks
     Block* current = chain->genesis;
     while (current) {
-        fwrite(&current->index, sizeof(uint32_t), 1, file);
-        fwrite(&current->timestamp, sizeof(time_t), 1, file);
-        fwrite(&current->transaction_count, sizeof(int), 1, file);
-        fwrite(current->transactions, sizeof(Transaction), current->transaction_count, file);
-        fwrite(current->previous_hash, sizeof(char), 65, file);
-        fwrite(current->hash, sizeof(char), 65, file);
+        if (fwrite(&current->index, sizeof(uint32_t), 1, file) != 1 ||
+            fwrite(&current->timestamp, sizeof(time_t), 1, file) != 1 ||
+            fwrite(&current->transaction_count, sizeof(int), 1, file) != 1 ||
+            fwrite(current->transactions, sizeof(Transaction), current->transaction_count, file) != current->transaction_count ||
+            fwrite(current->previous_hash, sizeof(uint8_t), SHA256_DIGEST_SIZE, file) != SHA256_DIGEST_SIZE ||
+            fwrite(current->hash, sizeof(uint8_t), SHA256_DIGEST_SIZE, file) != SHA256_DIGEST_SIZE) {
+            fclose(file);
+            return 0;
+        }
         current = current->next;
     }
 
     fclose(file);
+    return 1;
 }
 
 Blockchain* load_blockchain(const char* filename) {
@@ -193,7 +205,10 @@ Blockchain* load_blockchain(const char* filename) {
 
     // Read blockchain metadata
     int difficulty;
-    fread(&difficulty, sizeof(int), 1, file);
+    if (fread(&difficulty, sizeof(int), 1, file) != 1) {
+        fclose(file);
+        return NULL;
+    }
 
     Blockchain* chain = create_blockchain(difficulty);
     if (!chain) {
@@ -204,12 +219,16 @@ Blockchain* load_blockchain(const char* filename) {
     // Read blocks
     Block* current = chain->genesis;
     while (1) {
-        fread(&current->index, sizeof(uint32_t), 1, file);
-        fread(&current->timestamp, sizeof(time_t), 1, file);
-        fread(&current->transaction_count, sizeof(int), 1, file);
-        fread(current->transactions, sizeof(Transaction), current->transaction_count, file);
-        fread(current->previous_hash, sizeof(char), 65, file);
-        fread(current->hash, sizeof(char), 65, file);
+        if (fread(&current->index, sizeof(uint32_t), 1, file) != 1 ||
+            fread(&current->timestamp, sizeof(time_t), 1, file) != 1 ||
+            fread(&current->transaction_count, sizeof(int), 1, file) != 1 ||
+            fread(current->transactions, sizeof(Transaction), current->transaction_count, file) != current->transaction_count ||
+            fread(current->previous_hash, sizeof(uint8_t), SHA256_DIGEST_SIZE, file) != SHA256_DIGEST_SIZE ||
+            fread(current->hash, sizeof(uint8_t), SHA256_DIGEST_SIZE, file) != SHA256_DIGEST_SIZE) {
+            free_blockchain(chain);
+            fclose(file);
+            return NULL;
+        }
 
         // Check if we've reached the end of the file
         if (feof(file)) break;

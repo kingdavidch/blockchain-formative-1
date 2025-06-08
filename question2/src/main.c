@@ -11,19 +11,39 @@ void test_blockchain() {
     }
 
     // Add some transactions to the genesis block
-    add_transaction(chain->genesis, "Alice", "Bob", 10.5);
-    add_transaction(chain->genesis, "Bob", "Charlie", 5.0);
+    if (!add_transaction(chain->genesis, "Alice", "Bob", 10.5)) {
+        printf("Failed to add transaction to genesis block\n");
+        free_blockchain(chain);
+        return;
+    }
+    if (!add_transaction(chain->genesis, "Bob", "Charlie", 5.0)) {
+        printf("Failed to add transaction to genesis block\n");
+        free_blockchain(chain);
+        return;
+    }
     calculate_block_hash(chain->genesis);
 
     // Add a new block with transactions
     add_block(chain);
-    add_transaction(chain->latest, "Charlie", "Alice", 7.5);
-    add_transaction(chain->latest, "Bob", "Alice", 3.0);
+    if (!add_transaction(chain->latest, "Charlie", "Alice", 7.5)) {
+        printf("Failed to add transaction to block\n");
+        free_blockchain(chain);
+        return;
+    }
+    if (!add_transaction(chain->latest, "Bob", "Alice", 3.0)) {
+        printf("Failed to add transaction to block\n");
+        free_blockchain(chain);
+        return;
+    }
     calculate_block_hash(chain->latest);
 
     // Add another block
     add_block(chain);
-    add_transaction(chain->latest, "Alice", "Charlie", 2.5);
+    if (!add_transaction(chain->latest, "Alice", "Charlie", 2.5)) {
+        printf("Failed to add transaction to block\n");
+        free_blockchain(chain);
+        return;
+    }
     calculate_block_hash(chain->latest);
 
     // Print the blockchain
@@ -40,7 +60,11 @@ void test_blockchain() {
 
     // Save the blockchain to a file
     printf("\nSaving blockchain to file...\n");
-    save_blockchain(chain, "blockchain.dat");
+    if (!save_blockchain(chain, "blockchain.dat")) {
+        printf("Failed to save blockchain to file\n");
+        free_blockchain(chain);
+        return;
+    }
 
     // Free the current blockchain
     free_blockchain(chain);
@@ -48,11 +72,14 @@ void test_blockchain() {
     // Load the blockchain from file
     printf("Loading blockchain from file...\n");
     chain = load_blockchain("blockchain.dat");
-    if (chain) {
-        printf("\nLoaded Blockchain Contents:\n");
-        print_blockchain(chain);
-        free_blockchain(chain);
+    if (!chain) {
+        printf("Failed to load blockchain from file\n");
+        return;
     }
+
+    printf("\nLoaded Blockchain Contents:\n");
+    print_blockchain(chain);
+    free_blockchain(chain);
 }
 
 int main() {
