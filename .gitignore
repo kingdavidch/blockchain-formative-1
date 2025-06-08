@@ -1,0 +1,24 @@
+# Build directories
+question1/bin/
+question1/obj/
+question2/bin/
+question2/obj/
+
+# Compiled files
+*.o
+*.out
+*.exe
+*.app
+
+# Blockchain data files
+*.dat
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db 
