@@ -4,29 +4,29 @@ Enhanced Blockchain Implementation
 Blockchain Contents:
 
 Block #0
-Timestamp: 1749408412
+Timestamp: 1749408723
 Previous Hash: 0000000000000000000000000000000000000000000000000000000000000000
-Hash: 8076eceeab881a875d9445bdcf7cd9186ee5b45f8ede49be2cee410c8d1050c1
+Hash: 59a9fbb9ab91853f416ce2fc7660abd7bdd7b5ea6a0b134d3272dd84f236a259
 Transactions:
-  1. Alice -> Bob: 10.50
-  2. Bob -> Charlie: 5.00
+  1. King -> Jack: 10.50
+  2. Jack -> Kraed: 5.00
 
 
 Block #1
-Timestamp: 1749408412
-Previous Hash: 8076eceeab881a875d9445bdcf7cd9186ee5b45f8ede49be2cee410c8d1050c1
-Hash: e7aeb2371922375da49658418494e653be07538638409083a39cb300d8b4bf73
+Timestamp: 1749408723
+Previous Hash: 59a9fbb9ab91853f416ce2fc7660abd7bdd7b5ea6a0b134d3272dd84f236a259
+Hash: 715771e4f5b594c521cce8280e8ebf66fe0d686a456caa33ce445b6ecde3c3cf
 Transactions:
-  1. Charlie -> Alice: 7.50
-  2. Bob -> Alice: 3.00
+  1. Kraed -> King: 7.50
+  2. Jack -> King: 3.00
 
 
 Block #2
-Timestamp: 1749408412
-Previous Hash: e7aeb2371922375da49658418494e653be07538638409083a39cb300d8b4bf73
-Hash: b1de4fd6d899866f7f43fdf034d7fad4a7a1d01cf57a9f0cddc2f476062e1602
+Timestamp: 1749408723
+Previous Hash: 715771e4f5b594c521cce8280e8ebf66fe0d686a456caa33ce445b6ecde3c3cf
+Hash: 3f4276393c539b89ad9e38dbac422bf16726b7736e2cd49bdffae4030369b364
 Transactions:
-  1. Alice -> Charlie: 2.50
+  1. King -> Kraed: 2.50
 
 Validating blockchain...
 Blockchain is valid!
@@ -37,34 +37,34 @@ Loading blockchain from file...
 Loaded Blockchain Contents:
 
 Block #0
-Timestamp: 1749408412
+Timestamp: 1749408723
 Previous Hash: 0000000000000000000000000000000000000000000000000000000000000000
-Hash: 8076eceeab881a875d9445bdcf7cd9186ee5b45f8ede49be2cee410c8d1050c1
+Hash: 59a9fbb9ab91853f416ce2fc7660abd7bdd7b5ea6a0b134d3272dd84f236a259
 Transactions:
-  1. Alice -> Bob: 10.50
-  2. Bob -> Charlie: 5.00
+  1. King -> Jack: 10.50
+  2. Jack -> Kraed: 5.00
 
 
 Block #1
-Timestamp: 1749408412
-Previous Hash: 8076eceeab881a875d9445bdcf7cd9186ee5b45f8ede49be2cee410c8d1050c1
-Hash: e7aeb2371922375da49658418494e653be07538638409083a39cb300d8b4bf73
+Timestamp: 1749408723
+Previous Hash: 59a9fbb9ab91853f416ce2fc7660abd7bdd7b5ea6a0b134d3272dd84f236a259
+Hash: 715771e4f5b594c521cce8280e8ebf66fe0d686a456caa33ce445b6ecde3c3cf
 Transactions:
-  1. Charlie -> Alice: 7.50
-  2. Bob -> Alice: 3.00
+  1. Kraed -> King: 7.50
+  2. Jack -> King: 3.00
 
 
 Block #2
-Timestamp: 1749408412
-Previous Hash: e7aeb2371922375da49658418494e653be07538638409083a39cb300d8b4bf73
-Hash: b1de4fd6d899866f7f43fdf034d7fad4a7a1d01cf57a9f0cddc2f476062e1602
+Timestamp: 1749408723
+Previous Hash: 715771e4f5b594c521cce8280e8ebf66fe0d686a456caa33ce445b6ecde3c3cf
+Hash: 3f4276393c539b89ad9e38dbac422bf16726b7736e2cd49bdffae4030369b364
 Transactions:
-  1. Alice -> Charlie: 2.50
+  1. King -> Kraed: 2.50
 
 
 Block #0
-Timestamp: 1749408412
+Timestamp: 1749408723
 Previous Hash: 0000000000000000000000000000000000000000000000000000000000000000
-Hash: 73b79c8b31a22e63b4dad9272ee690ff50f55d5f2e682770fe7ba25bb3ddad04
+Hash: 0f89e8fcfd96c6b35ab2d3d2f7acc32af11c9e7c9c2bd4e0b4cc8b23652cdd1f
 Transactions:
 
